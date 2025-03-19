@@ -7,11 +7,13 @@
 #include <time.h>
 #include <openssl/evp.h>
 
-#define MQTT_BROKER "eu1.cloud.thethings.network"
+#define MQTT_BROKER "192.168.1.245"
 #define MQTT_PORT 8883
-#define MQTT_USERNAME "****"
-#define MQTT_PASSWORD "****"
-#define CA_CERT_PATH "*****"  // Path to CA certificate (TTN's root CA)
+#define MQTT_USERNAME "default-app"
+#define MQTT_PASSWORD "NNSXS.QXTZ7ZJSOXHN2Q2JDZH64KGCF4WR7EUFPVRCG4Q.KWJEI2CTML7YOWYJNKB2UWGZP5GV7ZD2O2MI6IKXSXZV5RRZOQRA"
+const char *app_name = "default-app";
+
+// #define CA_CERT_PATH "*****"  // Path to CA certificate (TTN's root CA)
 
 long get_timestamp() {
     return time(NULL);  // Return current timestamp in seconds
@@ -41,7 +43,7 @@ void mqtt_publish(const char *device_name, const char *json_payload) {
     struct mosquitto *mosq;
     int rc;
     char topic[100];
-    snprintf(topic, sizeof(topic), "v3/app-test001@ttn/devices/%s/down/push", device_name);
+    snprintf(topic, sizeof(topic), "v3/%s/devices/%s/down/push", app_name, device_name);
 
     mosquitto_lib_init();
     mosq = mosquitto_new(NULL, true, NULL);
@@ -52,8 +54,8 @@ void mqtt_publish(const char *device_name, const char *json_payload) {
     }
 
     mosquitto_username_pw_set(mosq, MQTT_USERNAME, MQTT_PASSWORD);
-    mosquitto_tls_set(mosq, CA_CERT_PATH, NULL, NULL, NULL, NULL);
-    mosquitto_tls_insecure_set(mosq, true);  // Disable certificate verification for testing
+    // mosquitto_tls_set(mosq, CA_CERT_PATH, NULL, NULL, NULL, NULL);
+    // mosquitto_tls_insecure_set(mosq, true);  // Disable certificate verification for testing
     mosquitto_log_callback_set(mosq, on_log);
 
     rc = mosquitto_connect(mosq, MQTT_BROKER, MQTT_PORT, 60);
@@ -91,7 +93,12 @@ void mqtt_publish(const char *device_name, const char *json_payload) {
 
 int main(int argc, char *argv[]) {
     char *meas_period = NULL;
-    const char *data_to_encode_template = "{\"config\":{\"timestamp\":\"%s\",\"measPeriod\":\"%s\",\"action\":\"open\"}}";
+    char *message_type = NULL;  // Variable to hold the message type (C1, C2, etc.)
+    
+    // Define the templates for various message types
+    const char *update_payload = "{\"config\":{\"timestamp\":\"%s\",\"measPeriod\":\"%s\",\"action\":\"open\"}}";
+    const char *c1_payload = "{\"CONF\":\"1\"}";
+    const char *c2_payload = "{\"GPS\":\"1\"}";
 
     long timestamp = get_timestamp();
 
@@ -102,7 +109,7 @@ int main(int argc, char *argv[]) {
     char device_name[50];
     snprintf(device_name, sizeof(device_name), "default-device");
 
-    while ((opt = getopt(argc, argv, "d:m:")) != -1) {
+    while ((opt = getopt(argc, argv, "d:m:c:")) != -1) {  // Added -c option
         switch (opt) {
             case 'd':
                 snprintf(device_name, sizeof(device_name), "%s", optarg);
@@ -110,8 +117,11 @@ int main(int argc, char *argv[]) {
             case 'm':
                 meas_period = optarg;
                 break;
+            case 'c':
+                message_type = optarg;  // Capture message type
+                break;
             default:
-                fprintf(stderr, "Usage: %s -d device_name -m meas_period\n", argv[0]);
+                fprintf(stderr, "Usage: %s -d device_name -m meas_period -c message_type\n", argv[0]);
                 return EXIT_FAILURE;
         }
     }
@@ -120,8 +130,19 @@ int main(int argc, char *argv[]) {
         meas_period = "5";  // Default measurement period
     }
 
+    // Determine the message to encode based on the -c argument
     char data_to_encode[1024];  // Make sure the buffer is large enough
-    snprintf(data_to_encode, sizeof(data_to_encode), data_to_encode_template, timestamp_str, meas_period);
+
+    if (message_type == NULL || strcmp(message_type, "UP") == 0) {
+        snprintf(data_to_encode, sizeof(data_to_encode), update_payload, timestamp_str, meas_period);
+    } else if (strcmp(message_type, "C1") == 0) {
+        snprintf(data_to_encode, sizeof(data_to_encode), "%s", c1_payload);
+    } else if (strcmp(message_type, "C2") == 0) {
+        snprintf(data_to_encode, sizeof(data_to_encode), "%s", c2_payload);
+    } else {
+        fprintf(stderr, "Error: Unknown message type '%s'\n", message_type);
+        return EXIT_FAILURE;
+    }
 
     // Check the length before encoding
     size_t data_length = strlen(data_to_encode);

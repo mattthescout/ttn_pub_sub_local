@@ -1,0 +1,11 @@
+Timestamp: 2025-03-19_13-22-15	Dev name: sensor-5a7c5824000094cb	Data: {
+	"LAT":	"52.409920",
+	"LON":	"16.940372",
+	"ALT":	"0.00",
+	"T":	"0.00"
+}
+Timestamp: 2025-03-19_13-22-43	Dev name: sensor-5a7c5824000000d3	Data: {
+	"SM1":	"0",
+	"SM2":	"0",
+	"BL":	"99"
+}

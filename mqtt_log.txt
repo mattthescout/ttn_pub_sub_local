@@ -1,0 +1,35 @@
+Log: Client ttn_test sending CONNECT
+Connected successfully to broker.
+Log: Client ttn_test received CONNACK (0)
+Successfully connected to the broker!
+Client ID: 12
+Log: Client ttn_test sending SUBSCRIBE (Mid: 1, Topic: v3/default-app/devices/#, QoS: 0, Options: 0x00)
+Successfully subscribed to topic.
+Log: Client ttn_test received SUBACK
+Successfully subscribed. mid: 1
+Log: Client ttn_test received PUBLISH (d0, q0, r0, m0, 'v3/default-app/devices/sensor-5a7c5824000084cb/join', ... (537 bytes))
+Received message on topic v3/default-app/devices/sensor-5a7c5824000084cb/join
+Decoded JSON:
+{"end_device_ids":{"device_id":"sensor-5a7c5824000084cb","application_ids":{"application_id":"default-app"},"dev_eui":"5A7C5824000084CB","join_eui":"60C5A8FFFE753E41","dev_addr":"01F9BA14"},"correlation_ids":["gs:uplink:01JNZE7W0YN84JNNFN7S31WFD1","rpc:/ttn.lorawan.v3.GsNs/HandleUplink:01JNZE7W0Z7CABC4SZBEYQVR3Q","rpc:/ttn.lorawan.v3.NsAs/HandleUplink:01JNZE7XT9RHFYGRXX2T3YE0Y2"],"received_at":"2025-03-10T07:10:24.074127361Z","join_accept":{"session_key_id":"AZV+4/Ahka+xDG5/0jlaDA==","received_at":"2025-03-10T07:10:22.239327826Z"}}
+Unknown payload format.
+Log: Client ttn_test received PUBLISH (d0, q0, r0, m0, 'v3/default-app/devices/sensor-5a7c5824000084cb/up', ... (1158 bytes))
+Received message on topic v3/default-app/devices/sensor-5a7c5824000084cb/up
+Decoded JSON:
+{"end_device_ids":{"device_id":"sensor-5a7c5824000084cb","application_ids":{"application_id":"default-app"},"dev_eui":"5A7C5824000084CB","join_eui":"60C5A8FFFE753E41","dev_addr":"01F9BA14"},"correlation_ids":["gs:uplink:01JNZE81GHX7D410451JQ14JQ4","rpc:/ttn.lorawan.v3.GsNs/HandleUplink:01JNZE81GJZ98FEGGZAMJ70K19","rpc:/ttn.lorawan.v3.NsAs/HandleUplink:01JNZE81PWSKVYE8EB4E9PBXE3"],"received_at":"2025-03-10T07:10:28.060880097Z","uplink_message":{"session_key_id":"AZV+4/Ahka+xDG5/0jlaDA==","f_port":2,"frm_payload":"W3siU00xIjoiMCIsIlNNMiI6IjAiLCJCTCI6IjEwMCJ9XQ==","rx_metadata":[{"gateway_ids":{"gateway_id":"fcc23dfffe0b75d8","eui":"FCC23DFFFE0B75D8"},"timestamp":3696927467,"rssi":-40,"channel_rssi":-40,"snr":8.8,"uplink_token":"Ch4KHAoQZmNjMjNkZmZmZTBiNzVkOBII/MI9//4LddgQ68Xq4g0aDAjjoLq+BhCCgPWYAyD4y7GQzLxj","channel_index":3,"received_at":"2025-03-10T07:10:27.857000773Z"}],"settings":{"data_rate":{"lora":{"bandwidth":125000,"spreading_factor":7,"coding_rate":"4/5"}},"frequency":"867100000","timestamp":3696927467},"received_at":"2025-03-10T07:10:27.858166131Z","confirmed":true,"consumed_airtime":"0.092416s","network_ids":{"net_id":"000000"}}}
+Unknown payload format.
+Log: Client ttn_test sending PINGREQ
+Log: Client ttn_test received PINGRESP
+Log: Client ttn_test received PUBLISH (d0, q0, r0, m0, 'v3/default-app/devices/sensor-5a7c5824000084cb/join', ... (537 bytes))
+Received message on topic v3/default-app/devices/sensor-5a7c5824000084cb/join
+Decoded JSON:
+{"end_device_ids":{"device_id":"sensor-5a7c5824000084cb","application_ids":{"application_id":"default-app"},"dev_eui":"5A7C5824000084CB","join_eui":"60C5A8FFFE753E41","dev_addr":"00A083EF"},"correlation_ids":["gs:uplink:01JNZE9ZNNJQNQT8H2G2QX5YJS","rpc:/ttn.lorawan.v3.GsNs/HandleUplink:01JNZE9ZNNE904V196DRZRC1R9","rpc:/ttn.lorawan.v3.NsAs/HandleUplink:01JNZEA1E96XHQ4ER4QT83AT2A"],"received_at":"2025-03-10T07:11:33.321353692Z","join_accept":{"session_key_id":"AZV+5P64WzdSOmb+tvUumg==","received_at":"2025-03-10T07:11:31.509779816Z"}}
+Unknown payload format.
+Log: Client ttn_test received PUBLISH (d0, q0, r0, m0, 'v3/default-app/devices/sensor-5a7c5824000084cb/up', ... (1195 bytes))
+Received message on topic v3/default-app/devices/sensor-5a7c5824000084cb/up
+Decoded JSON:
+{"end_device_ids":{"device_id":"sensor-5a7c5824000084cb","application_ids":{"application_id":"default-app"},"dev_eui":"5A7C5824000084CB","join_eui":"60C5A8FFFE753E41","dev_addr":"00A083EF"},"correlation_ids":["gs:uplink:01JNZEA52M3A6QNYPDW09NSM4F","rpc:/ttn.lorawan.v3.GsNs/HandleUplink:01JNZEA52MGB1GNZBM1P2Z84D3","rpc:/ttn.lorawan.v3.NsAs/HandleUplink:01JNZEA59321C6W9KSQJ0HWR5Z"],"received_at":"2025-03-10T07:11:37.251726655Z","uplink_message":{"session_key_id":"AZV+5Client ttn_test sending CONNECT
+Successfully connected to the broker!
+Client ttn_test sending SUBSCRIBE (Mid: 1, Topic: v3/default-app/devices/#, QoS: 0, Options: 0x00)
+Client ttn_test received CONNACK (5)
+Connection failed.
+Error in loop, exiting...

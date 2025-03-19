@@ -2,14 +2,12 @@ CC = gcc
 CFLAGS = -Wall -g
 LIBS = -lmosquitto -lcjson -lb64 -lssl -lcrypto
 
-# Include paths for libraries and headers
-INCLUDE_PATH = -I/home/mateusz/libmosquitto_examples/ -I/usr/include/openssl
 
 # Directory for object files and final executables
 BUILD_DIR = build
 
 # Targets
-all: $(BUILD_DIR)/mqtt_pub $(BUILD_DIR)/mqtt_sub
+all: $(BUILD_DIR)/mqtt_pub $(BUILD_DIR)/mqtt_sub $(BUILD_DIR)/sub
 	@echo "Build finished!"
 
 # Create build directory if it doesn't exist
@@ -29,6 +27,11 @@ $(BUILD_DIR)/mqtt_pub: $(BUILD_DIR)/mqtt_pub.o
 $(BUILD_DIR)/mqtt_sub: $(BUILD_DIR)/mqtt_sub.o
 	$(CC) $(CFLAGS) $(BUILD_DIR)/mqtt_sub.o -o $(BUILD_DIR)/mqtt_sub $(LIBS)
 	rm -f $(BUILD_DIR)/mqtt_sub.o  # Remove object file after building
+
+$(BUILD_DIR)/sub: $(BUILD_DIR)/sub.o
+	$(CC) $(CFLAGS) $(BUILD_DIR)/sub.o -o $(BUILD_DIR)/sub $(LIBS)
+	rm -f $(BUILD_DIR)/sub.o  # Remove object file after building
+
 
 # Clean up
 clean:
