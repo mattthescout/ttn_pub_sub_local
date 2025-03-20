@@ -11,9 +11,8 @@
 #define MQTT_PORT 8883
 #define MQTT_USERNAME "default-app"
 #define MQTT_PASSWORD "NNSXS.QXTZ7ZJSOXHN2Q2JDZH64KGCF4WR7EUFPVRCG4Q.KWJEI2CTML7YOWYJNKB2UWGZP5GV7ZD2O2MI6IKXSXZV5RRZOQRA"
+//#define CA_CERT_PATH "/home/mateusz/libmosquitto_examples/cert/isrgrootx1.pem"  // Path to CA certificate (TTN's root CA)
 const char *app_name = "default-app";
-
-// #define CA_CERT_PATH "*****"  // Path to CA certificate (TTN's root CA)
 
 long get_timestamp() {
     return time(NULL);  // Return current timestamp in seconds
@@ -43,6 +42,7 @@ void mqtt_publish(const char *device_name, const char *json_payload) {
     struct mosquitto *mosq;
     int rc;
     char topic[100];
+    //snprintf(topic, sizeof(topic), "v3/app-test001@ttn/devices/%s/down/push", device_name);
     snprintf(topic, sizeof(topic), "v3/%s/devices/%s/down/push", app_name, device_name);
 
     mosquitto_lib_init();
@@ -54,8 +54,8 @@ void mqtt_publish(const char *device_name, const char *json_payload) {
     }
 
     mosquitto_username_pw_set(mosq, MQTT_USERNAME, MQTT_PASSWORD);
-    // mosquitto_tls_set(mosq, CA_CERT_PATH, NULL, NULL, NULL, NULL);
-    // mosquitto_tls_insecure_set(mosq, true);  // Disable certificate verification for testing
+    //mosquitto_tls_set(mosq, CA_CERT_PATH, NULL, NULL, NULL, NULL);
+    //mosquitto_tls_insecure_set(mosq, true);  // Disable certificate verification for testing
     mosquitto_log_callback_set(mosq, on_log);
 
     rc = mosquitto_connect(mosq, MQTT_BROKER, MQTT_PORT, 60);
@@ -92,18 +92,30 @@ void mqtt_publish(const char *device_name, const char *json_payload) {
 }
 
 int main(int argc, char *argv[]) {
-    char *meas_period = NULL;
-    char *message_type = NULL;  // Variable to hold the message type (C1, C2, etc.)
-    
-    // Define the templates for various message types
-    const char *update_payload = "{\"config\":{\"timestamp\":\"%s\",\"measPeriod\":\"%s\",\"action\":\"open\"}}";
-    const char *c1_payload = "{\"CONF\":\"1\"}";
-    const char *c2_payload = "{\"GPS\":\"1\"}";
-
     long timestamp = get_timestamp();
+
+    char *meas_period = NULL;
+    char *message_type = NULL;  // Variable to hold the message type (C1, C2, C3, C5, etc.)
+
+    // Define the templates for various message types
+	const char *update_payload = "{\"update\":{\"timestamp\":\"%s\",\"measPeriod\":\"%s\"}}";
+	const char *c1_payload = "{\"CONF\":\"1\"}";
+	const char *c2_payload = "{\"GPS\":\"1\"}";
+	const char *c3_payload = "{\"GPS\":\"1\"}";  // C3 payload
+	const char *c4_payload = "{\"IT\": \"False\", \"ITT\": \"%s\", \"ITW\": \"%llu\"}";  // C4 payload with False
+	const char *c5_payload = "{\"IT\": \"True\", \"ITT\": \"%s\", \"ITW\": \"%llu\"}";   // C5 payload with True
 
     char timestamp_str[20];
     snprintf(timestamp_str, sizeof(timestamp_str), "%ld", timestamp);
+
+    char task_time_str[20];
+    snprintf(task_time_str, sizeof(timestamp_str), "%ld", timestamp + (15 * 60));
+
+	long fixed_timestamp = 1742191200;
+	//snprintf(task_time_str, sizeof(timestamp_str), "%ld", fixed_timestamp);
+
+    printf("Current timestamp: %ld\n", timestamp);
+    printf("Task timestamp: %s\n", task_time_str);
 
     int opt;
     char device_name[50];
@@ -139,6 +151,12 @@ int main(int argc, char *argv[]) {
         snprintf(data_to_encode, sizeof(data_to_encode), "%s", c1_payload);
     } else if (strcmp(message_type, "C2") == 0) {
         snprintf(data_to_encode, sizeof(data_to_encode), "%s", c2_payload);
+    } else if (strcmp(message_type, "C3") == 0) {  // Handle C3
+        snprintf(data_to_encode, sizeof(data_to_encode), "%s", c3_payload);
+    } else if (strcmp(message_type, "C4") == 0) {  // Handle C4 with "False"
+        snprintf(data_to_encode, sizeof(data_to_encode), c4_payload, task_time_str, 120);
+    } else if (strcmp(message_type, "C5") == 0) {  // Handle C5 with "True"
+        snprintf(data_to_encode, sizeof(data_to_encode), c5_payload, task_time_str, 120);
     } else {
         fprintf(stderr, "Error: Unknown message type '%s'\n", message_type);
         return EXIT_FAILURE;
@@ -159,15 +177,15 @@ int main(int argc, char *argv[]) {
     char json_payload[2048];  // Increased buffer size
 
     int written = snprintf(json_payload, sizeof(json_payload),
-        "{"
-            "\"downlinks\": ["
-                "{"
-                    "\"f_port\": 15,"
-                    "\"frm_payload\": \"%s\","
-                    "\"priority\": \"NORMAL\""
-                "}"
-            "]"
-        "}", encoded_payload);
+    "{"
+        "\"downlinks\": ["
+            "{"
+                "\"f_port\": 15,"
+                "\"frm_payload\": \"%s\","
+                "\"priority\": \"NORMAL\""
+            "}"
+        "]"
+    "}", encoded_payload);
 
     if (written < 0 || written >= sizeof(json_payload)) {
         fprintf(stderr, "Error formatting JSON payload\n");
@@ -182,3 +200,5 @@ int main(int argc, char *argv[]) {
 
     return 0;
 }
+
+//./mqtt_pub -d actuator-device -m 1 -c C5
